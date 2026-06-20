@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ziner — Zine Template Builder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Ziner</h1>
+    <p>Drop images named <code>imageC</code>, <code>image1</code>–<code>image12</code>, <code>imageX2</code>, <code>imageX3</code> onto the sheet. <code>imageX2</code> and <code>imageX3</code> mirror each other. Panel X1 prints with tuck instructions.</p>
+  </header>
+
+  <main>
+    <section class="workspace">
+      <div class="panel-toolbar">
+        <label class="btn">
+          Add images
+          <input type="file" id="file-input" accept="image/*" multiple hidden>
+        </label>
+        <button type="button" id="clear-btn" class="btn btn-ghost">Clear all</button>
+        <button type="button" id="export-btn" class="btn btn-primary">Download sheet</button>
+
+        <div class="spine-controls">
+          <label class="check">
+            <input type="checkbox" id="spine-toggle">
+            Spine
+          </label>
+          <label class="spine-field">
+            <span>Tone</span>
+            <input type="color" id="spine-color" value="#1b1b1b">
+          </label>
+          <label class="spine-field">
+            <span>Width</span>
+            <input type="number" id="spine-width" value="10" min="0" max="40" step="0.5">
+            mm
+          </label>
+        </div>
+      </div>
+
+      <div class="sheet-wrap">
+        <p class="sheet-label">Print sheet (4×4 · A4)</p>
+        <div id="sheet" class="sheet" aria-label="Zine print sheet"></div>
+      </div>
+
+      <aside class="palette" id="palette">
+        <h2>Unplaced images</h2>
+        <div id="palette-items" class="palette-items"></div>
+      </aside>
+    </section>
+
+    <section class="preview-section">
+      <h2>Reading preview</h2>
+      <p class="preview-hint">Pages in order as they appear when you read the zine.</p>
+      <div id="reading-preview" class="reading-preview"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
