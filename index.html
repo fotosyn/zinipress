@@ -14,44 +14,164 @@
 
   <main>
     <section class="workspace">
-      <div class="panel-toolbar">
+      <div class="action-bar">
         <label class="btn">
           Add images
           <input type="file" id="file-input" accept="image/*" multiple hidden>
         </label>
         <button type="button" id="clear-btn" class="btn btn-ghost">Clear all</button>
+        <div class="action-bar-spacer" aria-hidden="true"></div>
         <button type="button" id="export-btn" class="btn btn-primary">Download sheet</button>
+      </div>
 
-        <div class="spine-controls">
-          <label class="check">
-            <input type="checkbox" id="spine-toggle">
-            Spine
-          </label>
-          <label class="spine-field">
-            <span>Tone</span>
-            <input type="color" id="spine-color" value="#1b1b1b">
-          </label>
-          <label class="spine-field">
-            <span>Width</span>
-            <input type="number" id="spine-width" value="10" min="0" max="40" step="0.5">
-            mm
-          </label>
+      <div class="workspace-columns">
+        <div class="sheet-column">
+          <div class="panel sheet-panel">
+            <div class="panel-head">
+              <h2 class="column-header">Print sheet (4×4 · A4)</h2>
+            </div>
+            <div class="sheet-wrap">
+              <div class="sheet-cuts">
+                <div class="sheet-cut-guide sheet-cut-guide--row-1-2" title="Cut across three panels — keep the right panel attached">
+                  <svg class="sheet-cut-scissors" viewBox="0 0 24 16" width="18" height="12" aria-hidden="true">
+                    <circle cx="4" cy="4" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="4" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M6 5.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M6 10.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span class="sheet-cut-line"></span>
+                </div>
+                <div class="sheet-cut-guide sheet-cut-guide--row-3-4" title="Cut across three panels — keep the right panel attached">
+                  <svg class="sheet-cut-scissors" viewBox="0 0 24 16" width="18" height="12" aria-hidden="true">
+                    <circle cx="4" cy="4" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="4" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M6 5.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M6 10.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                  <span class="sheet-cut-line"></span>
+                </div>
+              </div>
+              <div class="sheet-stage">
+                <div id="sheet" class="sheet" aria-label="Zine print sheet"></div>
+                <div class="sheet-cut-overlays" aria-hidden="true">
+                  <span class="sheet-cut-span sheet-cut-span--row-1-2 sheet-cut-span--from-left"></span>
+                  <span class="sheet-cut-span sheet-cut-span--row-2-3 sheet-cut-span--from-right"></span>
+                  <span class="sheet-cut-span sheet-cut-span--row-3-4 sheet-cut-span--from-left"></span>
+                </div>
+              </div>
+              <div class="sheet-cuts sheet-cuts--right">
+                <div class="sheet-cut-guide sheet-cut-guide--row-2-3" title="Cut across three panels — keep the left panel attached">
+                  <span class="sheet-cut-line"></span>
+                  <svg class="sheet-cut-scissors" viewBox="0 0 24 16" width="18" height="12" aria-hidden="true">
+                    <circle cx="4" cy="4" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="4" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M6 5.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M6 10.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="sheet-wrap">
-        <p class="sheet-label">Print sheet (4×4 · A4)</p>
-        <div id="sheet" class="sheet" aria-label="Zine print sheet"></div>
-      </div>
+        <aside class="options-column">
+          <div class="options-stack">
+            <div class="panel option-panel spine-controls">
+              <div class="panel-head">
+                <h2 class="column-header">Spine</h2>
+                <label class="mini-toggle" title="Enable spine">
+                  <input type="checkbox" id="spine-toggle">
+                  <span class="mini-toggle-track" aria-hidden="true"></span>
+                  <span class="visually-hidden">Enable spine</span>
+                </label>
+              </div>
+              <div class="panel-body">
+                <label class="option-field">
+                  <span>Tone</span>
+                  <input type="color" id="spine-color" value="#1b1b1b">
+                </label>
+                <label class="option-field">
+                  <span>Width</span>
+                  <span class="option-field-input">
+                    <input type="number" id="spine-width" value="10" min="0" max="40" step="0.5">
+                    mm
+                  </span>
+                </label>
+              </div>
+            </div>
 
-      <aside class="palette" id="palette">
-        <h2>Unplaced images</h2>
-        <div id="palette-items" class="palette-items"></div>
-      </aside>
+            <div class="panel option-panel tail-controls">
+              <div class="panel-head">
+                <h2 class="column-header">Tail</h2>
+                <label class="mini-toggle" title="Enable tail">
+                  <input type="checkbox" id="tail-toggle">
+                  <span class="mini-toggle-track" aria-hidden="true"></span>
+                  <span class="visually-hidden">Enable tail</span>
+                </label>
+              </div>
+              <div class="panel-body">
+                <label class="option-field">
+                  <span>Message</span>
+                  <input type="text" id="tail-text" value="© 2026 · Your Name" disabled>
+                </label>
+                <label class="option-field">
+                  <span>Background</span>
+                  <input type="color" id="tail-bg" value="#1b1b1b">
+                </label>
+                <label class="option-field">
+                  <span>Text</span>
+                  <input type="color" id="tail-color" value="#ffffff">
+                </label>
+                <label class="option-field">
+                  <span>Font</span>
+                  <select id="tail-font" disabled></select>
+                </label>
+              </div>
+            </div>
+
+            <div class="panel option-panel back-cover-controls">
+              <div class="panel-head">
+                <h2 class="column-header">Solid back cover</h2>
+                <label class="mini-toggle" title="Enable solid back">
+                  <input type="checkbox" id="back-cover-toggle">
+                  <span class="mini-toggle-track" aria-hidden="true"></span>
+                  <span class="visually-hidden">Enable solid back</span>
+                </label>
+              </div>
+              <div class="panel-body">
+                <label class="option-field">
+                  <span>Colour</span>
+                  <input type="color" id="back-cover-color" value="#1b1b1b">
+                </label>
+                <label class="option-field">
+                  <span>Text</span>
+                  <input type="text" id="back-cover-text" placeholder="Back cover line" disabled>
+                </label>
+                <label class="option-field">
+                  <span>Text colour</span>
+                  <input type="color" id="back-cover-text-color" value="#ffffff">
+                </label>
+                <label class="option-field">
+                  <span>Position</span>
+                  <select id="back-cover-position" disabled>
+                    <option value="top">Top</option>
+                    <option value="middle" selected>Middle</option>
+                    <option value="bottom">Bottom</option>
+                  </select>
+                </label>
+                <label class="option-field">
+                  <span>Font</span>
+                  <select id="back-cover-font" disabled></select>
+                </label>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
     </section>
 
     <section class="preview-section">
-      <h2>Reading preview</h2>
+      <h2 class="section-title">Reading preview</h2>
       <p class="preview-hint">Pages in order as they appear when you read the zine.</p>
       <div id="reading-preview" class="reading-preview"></div>
     </section>
