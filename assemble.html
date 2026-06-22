@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Folding &amp; cutting guide — Ziner</title>
+  <meta name="description" content="How to cut, fold, and assemble a Ziner zine from a single A4 print sheet.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assemble.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="topbar__back" href="index.html">← Back to Ziner</a>
+      <span class="topbar__brand">Ziner</span>
+    </header>
+
+    <div class="hero">
+      <h1 class="hero__title">Folding &amp; cutting guide</h1>
+      <p class="hero__lede">Print your sheet at 100% on A4, crease the long- and short-edge folds, make three partial cuts, then assemble and tuck the flap. Keep this page open while you work, or print it for the bench.</p>
+    </div>
+
+    <section class="section">
+      <h2>1. Print</h2>
+      <ol>
+        <li>Download your sheet from Ziner and open the PNG.</li>
+        <li>Print on <strong>A4 paper at 100% scale</strong> (no “fit to page”).</li>
+        <li>Use a sharp craft knife or scissors on a cutting mat.</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>2. Know your sheet</h2>
+      <p>The print sheet is a 4×4 grid. Rows 1 and 3 print upside down — that is correct. You need <strong>three long-edge folds</strong> (between the four columns) and <strong>three short-edge folds</strong> (between the four rows). Three <strong>partial cuts</strong> run between the rows (see red dashed lines). When assembled, pages read: front cover → 1 → 2 → … → 12 → back cover.</p>
+
+      <div class="legend" aria-hidden="true">
+        <span class="legend__item"><span class="legend__swatch legend__swatch--fold legend__swatch--fold-long"></span> Long-edge fold (between columns)</span>
+        <span class="legend__item"><span class="legend__swatch legend__swatch--fold legend__swatch--fold-short"></span> Short-edge fold (between rows)</span>
+        <span class="legend__item"><span class="legend__swatch legend__swatch--cut"></span> Cut (three panels · scissors show direction)</span>
+        <span class="legend__item"><span class="legend__swatch legend__swatch--hinge"></span> Hinge (leave attached)</span>
+      </div>
+
+      <div class="sheet-diagram-wrap">
+        <div class="sheet-diagram-cuts sheet-diagram-cuts--left" aria-hidden="true">
+          <div class="sheet-diagram__cut-guide sheet-diagram__cut-guide--1-2">
+            <svg class="sheet-diagram__scissors" viewBox="0 0 24 16" width="22" height="14" aria-hidden="true">
+              <circle cx="4" cy="4" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="4" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 5.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M6 10.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="sheet-diagram__cut-guide sheet-diagram__cut-guide--3-4">
+            <svg class="sheet-diagram__scissors" viewBox="0 0 24 16" width="22" height="14" aria-hidden="true">
+              <circle cx="4" cy="4" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="4" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 5.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M6 10.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="sheet-diagram" role="img" aria-label="Four by four zine sheet with fold creases, hinge panels, and three partial cut lines between rows one and two, two and three, and three and four.">
+          <span class="sheet-diagram__fold-line sheet-diagram__fold-line--long sheet-diagram__fold-line--pos-1" aria-hidden="true"></span>
+          <span class="sheet-diagram__fold-line sheet-diagram__fold-line--long sheet-diagram__fold-line--pos-2" aria-hidden="true"></span>
+          <span class="sheet-diagram__fold-line sheet-diagram__fold-line--long sheet-diagram__fold-line--pos-3" aria-hidden="true"></span>
+          <span class="sheet-diagram__fold-line sheet-diagram__fold-line--short sheet-diagram__fold-line--pos-1" aria-hidden="true"></span>
+          <span class="sheet-diagram__fold-line sheet-diagram__fold-line--short sheet-diagram__fold-line--pos-2" aria-hidden="true"></span>
+          <span class="sheet-diagram__fold-line sheet-diagram__fold-line--short sheet-diagram__fold-line--pos-3" aria-hidden="true"></span>
+
+          <div class="sheet-row">
+            <div class="panel panel--flipped">No image</div>
+            <div class="panel panel--flipped">Back cover</div>
+            <div class="panel panel--flipped">12</div>
+            <div class="panel panel--flipped panel--hinge">11</div>
+          </div>
+          <div class="sheet-row">
+            <div class="panel panel--hinge">7</div>
+            <div class="panel">8</div>
+            <div class="panel">9</div>
+            <div class="panel">10</div>
+          </div>
+          <div class="sheet-row">
+            <div class="panel panel--flipped">6</div>
+            <div class="panel panel--flipped">5</div>
+            <div class="panel panel--flipped">4</div>
+            <div class="panel panel--flipped panel--hinge">3</div>
+          </div>
+          <div class="sheet-row">
+            <div class="panel">Back cover/Flap</div>
+            <div class="panel">Front cover</div>
+            <div class="panel">1</div>
+            <div class="panel">2</div>
+          </div>
+
+          <span class="sheet-diagram__cut-span sheet-diagram__cut-span--1-2 sheet-diagram__cut-span--from-left" aria-hidden="true"></span>
+          <span class="sheet-diagram__cut-span sheet-diagram__cut-span--2-3 sheet-diagram__cut-span--from-right" aria-hidden="true"></span>
+          <span class="sheet-diagram__cut-span sheet-diagram__cut-span--3-4 sheet-diagram__cut-span--from-left" aria-hidden="true"></span>
+        </div>
+
+        <div class="sheet-diagram-cuts sheet-diagram-cuts--right" aria-hidden="true">
+          <div class="sheet-diagram__cut-guide sheet-diagram__cut-guide--2-3">
+            <svg class="sheet-diagram__scissors sheet-diagram__scissors--flip" viewBox="0 0 24 16" width="22" height="14" aria-hidden="true">
+              <circle cx="4" cy="4" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="4" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M6 5.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <path d="M6 10.5 L22 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <p class="note"><strong>Tip:</strong> In Ziner, hover the scissors beside the print sheet to preview each cut line in red before you export.</p>
+    </section>
+
+    <section class="section">
+      <h2>3. Long-edge folds</h2>
+      <p>With the sheet portrait, the <strong>long edges</strong> are the left and right sides. These folds run <strong>between the four columns</strong> — you end up with three crease lines across the sheet.</p>
+
+      <div class="fold-block">
+        <p>Bring the <strong>left long edge</strong> to the <strong>right long edge</strong>, crease down the centre, then fold each outer edge back towards that middle crease.</p>
+        <div class="fold-sequence" aria-hidden="true">
+          <figure class="fold-step">
+            <div class="fold-sheet fold-sheet--half">
+              <div class="fold-sheet__cols">
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+              </div>
+              <span class="fold-sheet__crease"></span>
+            </div>
+            <figcaption>A4 folded in half along long edge</figcaption>
+          </figure>
+          <figure class="fold-step">
+            <div class="fold-sheet fold-sheet--half">
+              <div class="fold-sheet__cols">
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+              </div>
+              <span class="fold-sheet__crease"></span>
+              <span class="fold-sheet__edge-arrow fold-sheet__edge-arrow--left">→</span>
+              <span class="fold-sheet__edge-arrow fold-sheet__edge-arrow--right">←</span>
+            </div>
+            <figcaption>Edges of this fold — folded back towards the middle fold</figcaption>
+          </figure>
+          <figure class="fold-step">
+            <div class="fold-sheet">
+              <div class="fold-sheet__cols">
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+                <span class="fold-sheet__col"></span>
+              </div>
+              <span class="fold-sheet__crease fold-sheet__crease--quarter-left"></span>
+              <span class="fold-sheet__crease"></span>
+              <span class="fold-sheet__crease fold-sheet__crease--quarter-right"></span>
+            </div>
+            <figcaption>Three folds on long edge of page</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Short-edge folds</h2>
+      <p>With the sheet portrait, the <strong>short edges</strong> are the top and bottom. These folds run <strong>between the four rows</strong> — again, three crease lines. Open flat after the long-edge folds first.</p>
+
+      <div class="fold-block">
+        <p>Bring the <strong>top short edge</strong> to the <strong>bottom short edge</strong>, crease across the centre, then fold each outer edge back towards that middle crease.</p>
+        <div class="fold-sequence" aria-hidden="true">
+          <figure class="fold-step">
+            <div class="fold-sheet fold-sheet--half-h">
+              <div class="fold-sheet__rows">
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+              </div>
+              <span class="fold-sheet__crease-h"></span>
+            </div>
+            <figcaption>A4 folded in half along short edge</figcaption>
+          </figure>
+          <figure class="fold-step">
+            <div class="fold-sheet fold-sheet--half-h">
+              <div class="fold-sheet__rows">
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+              </div>
+              <span class="fold-sheet__crease-h"></span>
+              <span class="fold-sheet__edge-arrow fold-sheet__edge-arrow--top">↓</span>
+              <span class="fold-sheet__edge-arrow fold-sheet__edge-arrow--bottom">↑</span>
+            </div>
+            <figcaption>Edges of this fold — folded back towards the middle fold</figcaption>
+          </figure>
+          <figure class="fold-step">
+            <div class="fold-sheet">
+              <div class="fold-sheet__rows">
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+                <span class="fold-sheet__row"></span>
+              </div>
+              <span class="fold-sheet__crease-h fold-sheet__crease-h--quarter-top"></span>
+              <span class="fold-sheet__crease-h"></span>
+              <span class="fold-sheet__crease-h fold-sheet__crease-h--quarter-bottom"></span>
+            </div>
+            <figcaption>Three folds on short edge of page</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <p class="note"><strong>Before cutting:</strong> Open the sheet flat again. The long- and short-edge creases help you align each horizontal cut in the next step.</p>
+    </section>
+
+    <section class="section">
+      <h2>5. Cut (three lines)</h2>
+      <p>Each cut goes across <strong>three panels</strong> only. One panel stays attached as a hinge on every row.</p>
+
+      <div class="cut-block">
+        <h3>Cut A — between rows 1 and 2</h3>
+        <p>Cut from the <strong>left edge</strong> across the first three columns. Leave the <strong>right column</strong> (page 11) attached.</p>
+        <div class="cut-visual" aria-hidden="true">
+          <div class="cut-visual__segments">
+            <div class="cut-visual__cut"></div>
+            <div class="cut-visual__hinge">Hinge</div>
+          </div>
+          <span class="cut-visual__label">Left → right</span>
+        </div>
+      </div>
+
+      <div class="cut-block">
+        <h3>Cut B — between rows 2 and 3</h3>
+        <p>Cut from the <strong>right edge</strong> across the last three columns. Leave the <strong>left column</strong> (page 7) attached.</p>
+        <div class="cut-visual" aria-hidden="true">
+          <div class="cut-visual__segments cut-visual__segments--reverse">
+            <div class="cut-visual__cut"></div>
+            <div class="cut-visual__hinge">Hinge</div>
+          </div>
+          <span class="cut-visual__label">Right → left</span>
+        </div>
+      </div>
+
+      <div class="cut-block">
+        <h3>Cut C — between rows 3 and 4</h3>
+        <p>Cut from the <strong>left edge</strong> across the first three columns. Leave the <strong>right column</strong> (page 3) attached.</p>
+        <div class="cut-visual" aria-hidden="true">
+          <div class="cut-visual__segments">
+            <div class="cut-visual__cut"></div>
+            <div class="cut-visual__hinge">Hinge</div>
+          </div>
+          <span class="cut-visual__label">Left → right</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>6. Fold &amp; assemble</h2>
+      <ol>
+        <li>Re-fold along the long- and short-edge creases, then accordion-fold each cut strip so pages stack in reading order (front cover at the front, page 12 near the back).</li>
+        <li>Wrap the finished block with the cover panels. Tuck the <strong>No image</strong> flap panel in behind the front cover, as printed (“Tuck this page in”).</li>
+        <li>Align the back cover and back cover flap. If you enabled a <strong>spine band</strong> in Ziner, glue the flap to the back cover along that band so the image lines up across the fold.</li>
+        <li>Check the reading preview in Ziner if you want to confirm page order before printing.</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>7. Finished order</h2>
+      <p>When complete, pages read:</p>
+      <p><strong>Front cover → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → Back cover</strong></p>
+    </section>
+
+    <footer class="footer">
+      <p>Ziner · By Jim Moore · 2026 · <a href="index.html">Return to builder</a></p>
+    </footer>
+  </div>
+</body>
+</html>
