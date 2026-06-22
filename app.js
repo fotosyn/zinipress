@@ -39,6 +39,7 @@ const BACK_COVER_SLOTS = new Set(["X2", "X3"]);
 
 const state = {
   placements: {},
+  unused: [],
   spine: {
     enabled: false,
     color: "#1b1b1b",
@@ -63,6 +64,7 @@ const state = {
 };
 
 const sheetEl = document.getElementById("sheet");
+const unusedItemsEl = document.getElementById("unused-items");
 const readingPreviewEl = document.getElementById("reading-preview");
 const fileInput = document.getElementById("file-input");
 const clearBtn = document.getElementById("clear-btn");
@@ -137,11 +139,28 @@ function tailFraction() {
   return Math.min(Math.max(frac, 0), 0.9);
 }
 
+function getSlotDisplayLabel(slot) {
+  if (slot.instruction) return "Flap (No image)";
+  if (slot.id === "C") return "Front Cover";
+  if (slot.id === "X2") return "Back cover";
+  if (slot.id === "X3") return "Back cover (flap)";
+  return slot.id;
+}
+
+function getSlotImageHint(slotId) {
+  if (slotId === "C") return "imageC";
+  if (slotId === "X2" || slotId === "X3") return "imageBC";
+  return `image${slotId}`;
+}
+
 function normalizeName(filename) {
   const base = filename.replace(/\.[^.]+$/, "").toLowerCase();
   const cleaned = base.replace(/[\s_-]+/g, "");
 
   if (cleaned === "imagec" || cleaned === "c") return "C";
+
+  if (cleaned === "imagebc" || cleaned === "bc") return "X2";
+  if (cleaned === "imagebf" || cleaned === "bf") return "X2";
 
   const pageMatch = cleaned.match(/^image(\d{1,2})$/);
   if (pageMatch) return String(parseInt(pageMatch[1], 10));
@@ -154,15 +173,253 @@ function normalizeName(filename) {
   return null;
 }
 
+function generateId() {
+  return `u${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+}
+
 function createObjectUrl(file) {
   return URL.createObjectURL(file);
 }
 
 function revokeIfUnused(url) {
   const inPlacements = Object.values(state.placements).some((p) => p.url === url);
-  if (!inPlacements) {
+  const inUnused = state.unused.some((u) => u.url === url);
+  if (!inPlacements && !inUnused) {
     URL.revokeObjectURL(url);
   }
+}
+
+function addToUnused(file, url = createObjectUrl(file)) {
+  state.unused.push({ id: generateId(), file, url, filename: file.name });
+}
+
+function removeFromUnused(id) {
+  const idx = state.unused.findIndex((u) => u.id === id);
+  if (idx === -1) return;
+  const item = state.unused[idx];
+  state.unused.splice(idx, 1);
+  URL.revokeObjectURL(item.url);
+  render();
+}
+
+function displaceFromSlot(slotId) {
+  const existing = state.placements[slotId];
+  if (!existing) return;
+
+  if (existing.mirrored) {
+    delete state.placements[slotId];
+    return;
+  }
+
+  const mirrorTarget = MIRROR_PAIR[slotId];
+  if (mirrorTarget && state.placements[mirrorTarget]?.mirrored) {
+    delete state.placements[mirrorTarget];
+  }
+
+  state.unused.push({
+    id: generateId(),
+    file: existing.file,
+    url: existing.url,
+    filename: existing.file.name,
+  });
+  delete state.placements[slotId];
+}
+
+function placeFromUnused(unusedId, slotId) {
+  if (getSlot(slotId)?.instruction) return;
+
+  const idx = state.unused.findIndex((u) => u.id === unusedId);
+  if (idx === -1) return;
+  const item = state.unused[idx];
+
+  displaceFromSlot(slotId);
+  state.unused.splice(idx, 1);
+  state.placements[slotId] = { file: item.file, url: item.url, slotId, focusX: 50, focusY: 50 };
+  if (MIRROR_PAIR[slotId]) syncMirror(slotId);
+  render();
+}
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getCanonicalPlacement(slotId) {
+  const placement = state.placements[slotId];
+  if (!placement) return null;
+  if (placement.mirrored) {
+    const sourceId = MIRROR_PAIR[slotId];
+    return state.placements[sourceId] || placement;
+  }
+  return placement;
+}
+
+function getFocusForSlot(slotId) {
+  const canonical = getCanonicalPlacement(slotId);
+  if (!canonical) return { x: 50, y: 50 };
+
+  // Back cover pair shares one crop; X2’s 180° rotation handles upside-down pan direction.
+  return {
+    x: canonical.focusX ?? 50,
+    y: canonical.focusY ?? 50,
+  };
+}
+
+function writePlacementFocus(slotId, focusX, focusY) {
+  const placement = state.placements[slotId];
+  if (!placement) return;
+
+  if (BACK_COVER_SLOTS.has(slotId) || (placement.mirrored && BACK_COVER_SLOTS.has(MIRROR_PAIR[slotId]))) {
+    const canonical = state.placements.X2;
+    if (!canonical) return;
+    canonical.focusX = clamp(focusX, 0, 100);
+    canonical.focusY = clamp(focusY, 0, 100);
+    return;
+  }
+
+  let canonical = placement;
+  if (placement.mirrored) {
+    const canonicalSlotId = MIRROR_PAIR[slotId];
+    canonical = state.placements[canonicalSlotId];
+    if (!canonical) return;
+  }
+
+  canonical.focusX = clamp(focusX, 0, 100);
+  canonical.focusY = clamp(focusY, 0, 100);
+}
+
+function pointerDeltaToFocusDelta(slot, deltaX, deltaY) {
+  // Back cover is upside-down on the sheet — invert drag so finger tracks on screen.
+  if (slot.id === "X2") {
+    return { deltaX: -deltaX, deltaY: -deltaY };
+  }
+  if (slot.flipped) {
+    return { deltaX: -deltaX, deltaY: -deltaY };
+  }
+  return { deltaX, deltaY };
+}
+
+function setFocusFromSlot(slotId, focusX, focusY) {
+  writePlacementFocus(slotId, focusX, focusY);
+  render();
+}
+
+function refreshSlotImageFocus(slotId) {
+  const slot = getSlot(slotId);
+  const slotEl = sheetEl.querySelector(`.slot[data-slot-id="${slotId}"]`);
+  const img = slotEl?.querySelector(".slot-image");
+  if (slot && img) applyImageStyles(img, slot);
+}
+
+function refreshPreviewFrameFocus(pageKey) {
+  const frame =
+    pageKey === "back"
+      ? readingPreviewEl.querySelector('.preview-page-frame[data-preview-page="back"]')
+      : readingPreviewEl.querySelector(`.preview-page-frame[data-slot-id="${pageKey}"]`);
+  const img = frame?.querySelector("img");
+  if (!img) return;
+
+  const focusSlotId =
+    pageKey === "back" ? (state.placements.X2 ? "X2" : "X3") : pageKey;
+  const focus = getFocusForSlot(focusSlotId);
+  img.style.objectPosition = `${focus.x}% ${focus.y}%`;
+}
+
+function refreshAllImageFocus(slotId) {
+  refreshSlotImageFocus(slotId);
+  const mirrorId = MIRROR_PAIR[slotId];
+  if (mirrorId) refreshSlotImageFocus(mirrorId);
+
+  if (BACK_COVER_SLOTS.has(slotId)) {
+    refreshPreviewFrameFocus("back");
+  } else if (READING_ORDER.includes(slotId)) {
+    refreshPreviewFrameFocus(slotId);
+  }
+}
+
+function applyImageTransform(img, slot) {
+  const parts = [];
+  const spineFrac = spineFraction();
+
+  if (slot.spine && spineFrac > 0) {
+    parts.push(`translateX(${-spineFrac * 100}%)`);
+  }
+  if (slot.flipped) {
+    parts.push("rotate(180deg)");
+  }
+
+  img.style.transform = parts.length ? parts.join(" ") : "";
+}
+
+function applyImageStyles(img, slot) {
+  const focus = getFocusForSlot(slot.id);
+  img.style.objectPosition = `${focus.x}% ${focus.y}%`;
+  applyImageTransform(img, slot);
+  applyTailToImage(img, slot);
+}
+
+function setupImagePan(img, slot, { panSlot, focusSlotId } = {}) {
+  const effectivePanSlot = panSlot || slot;
+  const effectiveFocusSlotId = focusSlotId || slot.id;
+
+  img.draggable = false;
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
+  let startFocusX = 50;
+  let startFocusY = 50;
+
+  img.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    dragging = true;
+    img.setPointerCapture(e.pointerId);
+    img.classList.add("is-panning");
+    const focus = getFocusForSlot(effectiveFocusSlotId);
+    startFocusX = focus.x;
+    startFocusY = focus.y;
+    startX = e.clientX;
+    startY = e.clientY;
+  });
+
+  const endPan = (e) => {
+    if (!dragging) return;
+    dragging = false;
+    img.classList.remove("is-panning");
+    if (e.pointerId !== undefined) {
+      try {
+        img.releasePointerCapture(e.pointerId);
+      } catch {
+        /* already released */
+      }
+    }
+  };
+
+  img.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    const rect = img.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+
+    let deltaX = ((e.clientX - startX) / rect.width) * 100;
+    let deltaY = ((e.clientY - startY) / rect.height) * 100;
+    ({ deltaX, deltaY } = pointerDeltaToFocusDelta(effectivePanSlot, deltaX, deltaY));
+
+    writePlacementFocus(
+      effectiveFocusSlotId,
+      startFocusX - deltaX,
+      startFocusY - deltaY
+    );
+    refreshAllImageFocus(effectiveFocusSlotId);
+  });
+
+  const finishPan = (e) => {
+    if (!dragging) return;
+    endPan(e);
+    render();
+  };
+
+  img.addEventListener("pointerup", finishPan);
+  img.addEventListener("pointercancel", finishPan);
 }
 
 function syncMirror(sourceSlotId) {
@@ -190,10 +447,9 @@ function syncMirrorAfterChange(slotId, fromSlot) {
 function placeImage(slotId, file, url) {
   if (getSlot(slotId)?.instruction) return;
 
-  const existing = state.placements[slotId];
-  if (existing) revokeIfUnused(existing.url);
+  displaceFromSlot(slotId);
 
-  state.placements[slotId] = { file, url, slotId };
+  state.placements[slotId] = { file, url, slotId, focusX: 50, focusY: 50 };
   if (MIRROR_PAIR[slotId]) syncMirror(slotId);
   render();
 }
@@ -213,14 +469,16 @@ function removeFromSlot(slotId) {
     delete state.placements[mirrorTarget];
   }
 
-  revokeIfUnused(item.url);
+  addToUnused(item.file, item.url);
   delete state.placements[slotId];
   render();
 }
 
 function clearAll() {
   Object.values(state.placements).forEach((p) => URL.revokeObjectURL(p.url));
+  state.unused.forEach((u) => URL.revokeObjectURL(u.url));
   state.placements = {};
+  state.unused = [];
   render();
 }
 
@@ -234,15 +492,28 @@ function handleFiles(files) {
     if (slotId && getSlot(slotId) && !getSlot(slotId).instruction) {
       placeImage(slotId, file, url);
     } else {
-      URL.revokeObjectURL(url);
+      addToUnused(file, url);
     }
   });
   render();
 }
 
-function setupDragSource(el, slotId, source) {
+function setupUnusedDragSource(el, unusedId) {
   el.draggable = true;
   el.addEventListener("dragstart", (e) => {
+    e.dataTransfer.setData("application/ziner-unused", unusedId);
+    e.dataTransfer.setData("application/ziner-source", "unused");
+    e.dataTransfer.effectAllowed = "move";
+  });
+}
+
+function setupDragSource(el, slotId, source, { blockDragFrom = ".slot-image" } = {}) {
+  el.draggable = true;
+  el.addEventListener("dragstart", (e) => {
+    if (blockDragFrom && e.target.closest(blockDragFrom)) {
+      e.preventDefault();
+      return;
+    }
     e.dataTransfer.setData("application/ziner-slot", slotId);
     e.dataTransfer.setData("application/ziner-source", source);
     e.dataTransfer.effectAllowed = "move";
@@ -269,6 +540,12 @@ function setupSlotDrop(slotEl, slotId) {
 
     const fromSlot = e.dataTransfer.getData("application/ziner-slot");
     const source = e.dataTransfer.getData("application/ziner-source");
+    const unusedId = e.dataTransfer.getData("application/ziner-unused");
+
+    if (source === "unused" && unusedId) {
+      placeFromUnused(unusedId, slotId);
+      return;
+    }
 
     if (source === "slot" && fromSlot && fromSlot !== slotId) {
       const fromItem = state.placements[fromSlot];
@@ -286,12 +563,6 @@ function setupSlotDrop(slotEl, slotId) {
       render();
     }
   });
-}
-
-function applySpineToImage(img, slot) {
-  const frac = spineFraction();
-  if (!slot.spine || frac <= 0) return;
-  img.style.transform = `translateX(${-frac * 100}%)`;
 }
 
 function applyTailToImage(img, slot) {
@@ -376,6 +647,7 @@ function renderSheet() {
   SLOTS.forEach((slot) => {
     const slotEl = document.createElement("div");
     slotEl.className = "slot";
+    slotEl.dataset.slotId = slot.id;
     slotEl.style.gridRow = slot.row + 1;
     slotEl.style.gridColumn = slot.col + 1;
     if (slot.flipped) slotEl.classList.add("flipped");
@@ -383,7 +655,7 @@ function renderSheet() {
 
     const label = document.createElement("span");
     label.className = "slot-label";
-    label.textContent = slot.id === "C" ? "C (cover)" : slot.id;
+    label.textContent = getSlotDisplayLabel(slot);
     slotEl.appendChild(label);
 
     if (slot.instruction) {
@@ -406,8 +678,8 @@ function renderSheet() {
       img.className = "slot-image";
       img.src = placement.url;
       img.alt = `Page ${slot.id}`;
-      applySpineToImage(img, slot);
-      applyTailToImage(img, slot);
+      applyImageStyles(img, slot);
+      setupImagePan(img, slot);
       slotEl.appendChild(img);
 
       appendCoverBands(slotEl, slot);
@@ -429,7 +701,7 @@ function renderSheet() {
 
       const hint = document.createElement("span");
       hint.className = "slot-empty-hint";
-      hint.textContent = `image${slot.id === "C" ? "C" : slot.id}`;
+      hint.textContent = getSlotImageHint(slot.id);
       slotEl.appendChild(hint);
     }
 
@@ -456,31 +728,223 @@ function renderSheet() {
   });
 }
 
+function renderUnused() {
+  unusedItemsEl.innerHTML = "";
+
+  if (state.unused.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "unused-empty";
+    empty.textContent = "No unused images.";
+    unusedItemsEl.appendChild(empty);
+    return;
+  }
+
+  state.unused.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "unused-item";
+
+    const thumb = document.createElement("div");
+    thumb.className = "unused-item-thumb";
+
+    const img = document.createElement("img");
+    img.src = item.url;
+    img.alt = item.filename;
+    thumb.appendChild(img);
+
+    const meta = document.createElement("div");
+    meta.className = "unused-item-meta";
+
+    const name = document.createElement("span");
+    name.className = "unused-item-name";
+    name.textContent = item.filename;
+    name.title = item.filename;
+    meta.appendChild(name);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "unused-item-remove";
+    removeBtn.title = "Remove";
+    removeBtn.textContent = "×";
+    removeBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      removeFromUnused(item.id);
+    });
+    meta.appendChild(removeBtn);
+
+    card.appendChild(thumb);
+    card.appendChild(meta);
+    setupUnusedDragSource(card, item.id);
+    unusedItemsEl.appendChild(card);
+  });
+}
+
+function getBackCoverPreviewContent() {
+  if (isSolidBackCoverSlot("X3")) {
+    return { type: "solid" };
+  }
+
+  const placement = state.placements.X3 || state.placements.X2;
+  if (placement) {
+    return { type: "image", placement };
+  }
+
+  return null;
+}
+
+function getPreviewPlacementSlotId(pageDef) {
+  return pageDef.backCover ? "X2" : pageDef.id;
+}
+
+function getPreviewDragSlotId(pageDef) {
+  if (!pageDef.backCover) return pageDef.id;
+  if (state.placements.X2) return "X2";
+  if (state.placements.X3 && !state.placements.X3.mirrored) return "X3";
+  return "X2";
+}
+
+function canPreviewAcceptDrop(pageDef) {
+  if (pageDef.backCover) {
+    return !isSolidBackCoverSlot("X3");
+  }
+  const slot = getSlot(pageDef.id);
+  return slot && !slot.instruction;
+}
+
+function getReadingPanSlot(pageDef) {
+  if (pageDef.backCover) {
+    return { id: "X3", flipped: false };
+  }
+  const slot = getSlot(pageDef.id);
+  return slot ? { ...slot, flipped: false } : slot;
+}
+
+function setupPreviewDropTarget(frame, pageDef) {
+  const slotId = getPreviewPlacementSlotId(pageDef);
+  if (!canPreviewAcceptDrop(pageDef)) return;
+
+  frame.dataset.slotId = pageDef.backCover ? "back" : slotId;
+  if (pageDef.backCover) {
+    frame.dataset.previewPage = "back";
+  }
+
+  setupSlotDrop(frame, slotId);
+
+  frame.addEventListener("dragover", (e) => {
+    if (e.dataTransfer.types.includes("Files")) {
+      e.preventDefault();
+      frame.classList.add("drag-over");
+    }
+  });
+
+  frame.addEventListener("dragleave", () => {
+    frame.classList.remove("drag-over");
+  });
+
+  frame.addEventListener("drop", (e) => {
+    if (e.dataTransfer.files?.length) {
+      e.preventDefault();
+      frame.classList.remove("drag-over");
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith("image/")) {
+        placeImage(slotId, file, createObjectUrl(file));
+      }
+    }
+  });
+}
+
+function appendSolidBackPreview(frame) {
+  const fill = document.createElement("div");
+  fill.className = "preview-back-fill";
+  fill.style.background = state.backCover.color;
+  frame.appendChild(fill);
+
+  const message = state.backCover.text.trim();
+  if (message) {
+    const text = document.createElement("div");
+    text.className = `preview-back-text preview-back-text--${state.backCover.textPosition}`;
+    text.textContent = message;
+    text.style.color = state.backCover.textColor;
+    text.style.fontFamily = getBackCoverFont().family;
+    frame.appendChild(text);
+  }
+}
+
 function renderReadingPreview() {
   readingPreviewEl.innerHTML = "";
 
-  READING_ORDER.forEach((pageId) => {
+  const pages = [
+    { id: "C", label: "Front Cover", cover: true },
+    ...READING_ORDER.filter((id) => id !== "C").map((id) => ({ id, label: `Page ${id}` })),
+    { id: "back", label: "Back cover", backCover: true },
+  ];
+
+  pages.forEach((pageDef) => {
     const page = document.createElement("div");
     page.className = "preview-page";
-    if (pageId === "C") page.classList.add("cover");
+    if (pageDef.cover) page.classList.add("cover");
+    if (pageDef.backCover) page.classList.add("back-cover");
 
     const label = document.createElement("div");
     label.className = "preview-page-label";
-    label.textContent = pageId === "C" ? "Cover" : `Page ${pageId}`;
+    label.textContent = pageDef.label;
     page.appendChild(label);
 
     const frame = document.createElement("div");
     frame.className = "preview-page-frame";
 
-    const placement = state.placements[pageId];
-    if (placement) {
-      const img = document.createElement("img");
-      img.src = placement.url;
-      img.alt = `Preview page ${pageId}`;
-      frame.appendChild(img);
+    if (pageDef.backCover) {
+      const back = getBackCoverPreviewContent();
+      if (back?.type === "solid") {
+        appendSolidBackPreview(frame);
+      } else if (back?.type === "image") {
+        const img = document.createElement("img");
+        img.className = "preview-image";
+        img.src = back.placement.url;
+        img.alt = "Back cover preview";
+        const focusSlotId = state.placements.X2 ? "X2" : "X3";
+        const focus = getFocusForSlot(focusSlotId);
+        img.style.objectPosition = `${focus.x}% ${focus.y}%`;
+        const panSlot = getReadingPanSlot(pageDef);
+        setupImagePan(img, getSlot("X3"), {
+          panSlot,
+          focusSlotId: "X3",
+        });
+        frame.appendChild(img);
+      } else {
+        frame.classList.add("empty");
+        frame.textContent = "Drop image";
+      }
     } else {
-      frame.classList.add("empty");
-      frame.textContent = "—";
+      const placement = state.placements[pageDef.id];
+      if (placement) {
+        const img = document.createElement("img");
+        img.className = "preview-image";
+        img.src = placement.url;
+        img.alt = `Preview page ${pageDef.id}`;
+        const focus = getFocusForSlot(pageDef.id);
+        img.style.objectPosition = `${focus.x}% ${focus.y}%`;
+        const slot = getSlot(pageDef.id);
+        setupImagePan(img, slot, {
+          panSlot: getReadingPanSlot(pageDef),
+          focusSlotId: pageDef.id,
+        });
+        frame.appendChild(img);
+      } else {
+        frame.classList.add("empty");
+        frame.textContent = "Drop image";
+      }
+    }
+
+    if (canPreviewAcceptDrop(pageDef)) {
+      setupPreviewDropTarget(frame, pageDef);
+      const hasPlacement = pageDef.backCover
+        ? getBackCoverPreviewContent()?.type === "image"
+        : Boolean(state.placements[pageDef.id]);
+      if (hasPlacement) {
+        setupDragSource(page, getPreviewDragSlotId(pageDef), "slot", {
+          blockDragFrom: ".preview-image",
+        });
+      }
     }
 
     page.appendChild(frame);
@@ -490,27 +954,34 @@ function renderReadingPreview() {
 
 function render() {
   renderSheet();
+  renderUnused();
   renderReadingPreview();
 }
 
-function drawImageCover(ctx, img, dx, dy, dw, dh) {
+function drawImageCover(ctx, img, dx, dy, dw, dh, focusX = 50, focusY = 50) {
   const srcW = img.naturalWidth;
   const srcH = img.naturalHeight;
   const destAspect = dw / dh;
   const srcAspect = srcW / srcH;
 
-  let sx, sy, sw, sh;
+  let sx;
+  let sy;
+  let sw;
+  let sh;
   if (srcAspect > destAspect) {
     sh = srcH;
     sw = sh * destAspect;
-    sx = (srcW - sw) / 2;
+    sx = (srcW - sw) * (focusX / 100);
     sy = 0;
   } else {
     sw = srcW;
     sh = sw / destAspect;
     sx = 0;
-    sy = (srcH - sh) / 2;
+    sy = (srcH - sh) * (focusY / 100);
   }
+
+  sx = clamp(sx, 0, Math.max(0, srcW - sw));
+  sy = clamp(sy, 0, Math.max(0, srcH - sh));
 
   ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
 }
@@ -645,7 +1116,6 @@ async function exportSheet() {
 
   const cellW = width / 4;
   const cellH = height / 4;
-  const gap = 2;
   const spineFrac = spineFraction();
   const tailFrac = tailFraction();
 
@@ -662,19 +1132,19 @@ async function exportSheet() {
     const y = slot.row * cellH;
     const placement = state.placements[slot.id];
 
-    const insetX = x + gap;
-    const insetY = y + gap;
-    const insetW = cellW - gap * 2;
-    const insetH = cellH - gap * 2;
+    const insetX = x;
+    const insetY = y;
+    const insetW = cellW;
+    const insetH = cellH;
 
     if (slot.instruction) {
       ctx.save();
-      ctx.fillStyle = "#faf8f5";
+      ctx.fillStyle = "#ffffff";
       ctx.fillRect(insetX, insetY, insetW, insetH);
       ctx.fillStyle = "#1a1a1a";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      const fontSize = Math.round(insetW * 0.11);
+      const fontSize = Math.round(insetW * 0.07);
       ctx.font = `600 ${fontSize}px Georgia, "Times New Roman", serif`;
       if (slot.flipped) {
         ctx.translate(x + cellW / 2, y + cellH / 2);
@@ -694,15 +1164,34 @@ async function exportSheet() {
         ctx.rect(insetX, insetY, insetW, insetH);
         ctx.clip();
 
+        const focus = getFocusForSlot(slot.id);
         const spinePx = slot.spine ? spineFrac * insetW : 0;
         const tailPx = slot.tail ? tailFrac * insetW : 0;
 
         if (slot.flipped) {
           ctx.translate(x + cellW / 2, y + cellH / 2);
           ctx.rotate(Math.PI);
-          drawImageCover(ctx, img, -insetW / 2, -insetH / 2, insetW - tailPx, insetH);
+          drawImageCover(
+            ctx,
+            img,
+            -insetW / 2 - 1,
+            -insetH / 2 - 1,
+            insetW - tailPx + 2,
+            insetH + 2,
+            focus.x,
+            focus.y
+          );
         } else {
-          drawImageCover(ctx, img, insetX - spinePx, insetY, insetW, insetH);
+          drawImageCover(
+            ctx,
+            img,
+            insetX - spinePx - 1,
+            insetY - 1,
+            insetW + 2,
+            insetH + 2,
+            focus.x,
+            focus.y
+          );
         }
 
         if (spinePx > 0) {
@@ -734,10 +1223,6 @@ async function exportSheet() {
         drawTailBand(ctx, tailBandX(insetX, insetW, tailPx, slot.flipped), insetY, tailPx, insetH, slot.flipped);
       }
     }
-
-    ctx.strokeStyle = "#1a1a1a";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, cellW, cellH);
   }
 
   const link = document.createElement("a");
@@ -842,4 +1327,35 @@ populateFontSelect(tailFont, state.tail.fontId);
 setTailControlsEnabled(false);
 populateFontSelect(backCoverFont, state.backCover.fontId);
 setBackCoverControlsEnabled(false);
+
+const guidePanel = document.getElementById("guide");
+const guideLink = document.getElementById("guide-link");
+
+function openGuidePanel(scrollTarget) {
+  guidePanel.open = true;
+  requestAnimationFrame(() => {
+    const target = scrollTarget || guidePanel;
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+guideLink?.addEventListener("click", (e) => {
+  e.preventDefault();
+  history.pushState(null, "", "#guide");
+  openGuidePanel();
+});
+
+function handleGuideHash() {
+  if (location.hash !== "#guide" && location.hash !== "#privacy") return;
+  const scrollTarget = location.hash === "#privacy"
+    ? document.getElementById("privacy")
+    : guidePanel;
+  openGuidePanel(scrollTarget);
+}
+
+window.addEventListener("hashchange", handleGuideHash);
+if (location.hash === "#guide" || location.hash === "#privacy") {
+  handleGuideHash();
+}
+
 render();

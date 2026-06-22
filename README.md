@@ -10,13 +10,13 @@ No build step, no dependencies — just static HTML, CSS, and JavaScript.
 - **Drag and drop** — Drop images onto the sheet or individual panels; drag between panels
 - **Auto-placement by filename** — Name files `image1.jpg`, `imageC.png`, etc. and they land in the right slot
 - **Automatic rotation** — Panels on rows 1 and 3 are flipped 180° for correct print orientation
-- **Cover mirroring** — `imageX2` and `imageX3` sync automatically (either direction)
+- **Cover mirroring** — `imageBC` fills both back cover panels automatically
 - **Cut guides** — Scissors markers on the sheet edges; hover to highlight the cut line across three panels (one panel stays attached as the hinge)
-- **Spine band** — Optional band on X3 so the cover image aligns when glued to X2
-- **Tail band** — Optional vertical credit strip on X2
-- **Solid back cover** — Optional flat colour fill with text on X2 and X3 instead of images
-- **Tuck instruction** — Panel X1 prints with "Tuck this page in"
-- **Live preview** — Reading-order preview shows pages C → 12 as they appear in the finished zine
+- **Spine band** — Optional band on the back cover (flap) so the image aligns when glued to the back cover
+- **Tail band** — Optional vertical credit strip on the back cover panel
+- **Solid back cover** — Optional flat colour fill with text on both back cover panels instead of images
+- **Tuck instruction** — Flap panel prints with "Tuck this page in"
+- **Live preview** — Reading-order preview shows front cover, pages 1–12, and back cover
 - **PNG export** — Download a print-ready sheet at 2480 px wide (A4 aspect ratio)
 
 ## Quick start
@@ -40,25 +40,25 @@ The sheet is a 4×4 grid. Each cell is one panel on the physical page. Rows 1 an
 
 ```
 ┌─────────┬─────────┬─────────┬─────────┐
-│   X1    │   X2    │   12    │   11    │  row 1  ↑ flipped
-│  tuck   │  cover  │         │         │
+│  Flap   │ Back cv │   12    │   11    │  row 1  ↑ flipped
+│  tuck   │         │         │         │
 ├─ ✂ ─ ─ ─┼ ─ ─ ─ ─ ┼ ─ ─ ─ ─ ┼ ─ ─ ─ ─ ┤  cut (left; 3 panels)
 │    7    │    8    │    9    │   10    │  row 2
 ├ ─ ─ ─ ─ ┼ ─ ─ ─ ─ ┼ ─ ─ ─ ─ ┼ ─ ✂ ─ ─ ┤  cut (right; 3 panels)
 │    6    │    5    │    4    │    3    │  row 3  ↑ flipped
 ├─ ✂ ─ ─ ─┼ ─ ─ ─ ─ ┼ ─ ─ ─ ─ ┼ ─ ─ ─ ─ ┤  cut (left; 3 panels)
-│   X3    │    C    │    1    │    2    │  row 4
-│  cover  │  cover  │         │         │
+│  flap   │    C    │    1    │    2    │  row 4
+│         │  front  │         │         │
 └─────────┴─────────┴─────────┴─────────┘
 ```
 
-| Panel | Role |
-|-------|------|
-| **C** | Front cover |
-| **1–12** | Interior pages in reading order |
-| **X2** | Back cover (mirrors X3; tail band here when enabled) |
-| **X3** | Back cover wrap (mirrors X2; spine band here when enabled) |
-| **X1** | Tuck flap — prints instruction text, no image |
+| Panel label | File name | Role |
+|-------------|-----------|------|
+| **Front Cover** | `imageC` | Front cover |
+| **1–12** | `image1` … `image12` | Interior pages in reading order |
+| **Back cover** | `imageBC` | Back cover (mirrors to flap; tail band here when enabled) |
+| **Back cover (flap)** | `imageBC` | Back cover flap (mirrors from back cover; spine band here when enabled) |
+| **Flap (No image)** | — | Tuck flap — prints instruction text, no image |
 
 ### Cut guides
 
@@ -78,25 +78,31 @@ Drop a batch of files anywhere on the page, or use **Add images**. Files are pla
 
 | Filename examples | Panel |
 |-------------------|-------|
-| `imageC`, `image_c`, `image C` | C (cover) |
+| `imageC`, `image_c`, `image C` | Front cover |
 | `image1` … `image12` | Pages 1–12 |
-| `imageX2`, `image_x2` | X2 |
-| `imageX3`, `image_x3` | X3 |
+| `imageBC`, `image_bc`, `image BC` | Back cover (both panels) |
 
 Rules:
 
 - Extension is ignored (`image1.jpg`, `image1.png`, etc.)
 - Spaces, underscores, and hyphens are treated the same
-- `imageX` (no number) maps to X1, but X1 is instruction-only — those files are ignored
-- Unmatched filenames are ignored
+- `imageX` (no number) maps to the flap panel, but it is instruction-only — those files go to **Unused images**
+- Unmatched filenames appear in **Unused images** for manual placement
+
+## Privacy
+
+Ziner runs entirely in your browser — no backend, sign-in, or database. Images stay in memory on your device and are **never uploaded**. Export saves a PNG locally; closing the tab, refreshing, or clicking **Clear all** ends the session. The app uses no cookies, accounts, analytics, or third-party scripts.
+
+Full details are in the collapsible **Guide and Privacy** section on the page.
 
 ## Using the app
 
 ### Layout
 
+- **Guide and Privacy** — Collapsible instructions and privacy notice at the top
 - **Top bar** — Add images, Clear all, Download sheet
 - **Left column** — Print sheet with cut guides
-- **Right column** — Spine, Tail, and Solid back cover option panels (toggle switches in each header)
+- **Right column** — Spine, Tail, Solid back cover, and **Unused images**
 - **Below** — Reading preview in page order
 
 ### Adding images
@@ -104,27 +110,27 @@ Rules:
 1. **Batch drop** — Drag multiple files onto the sheet; each is placed by filename
 2. **Single panel** — Drag a file onto one panel
 3. **File picker** — Click **Add images**
+4. **Unused images** — Drag from the unused panel onto any panel
 
 ### Moving and removing
 
 - **Drag between panels** to swap or move images
-- Click **×** on a panel to remove its image
-- **Clear all** removes every placement
+- Click **×** on a panel to remove its image (returns to **Unused images** unless it was a mirror copy)
+- **Clear all** removes every placement and unused images
 
-### Cover panels (X2 and X3)
+### Back cover panels
 
-X2 and X3 always show the same image (unless **Solid back cover** is enabled). Place it on either panel:
+The **back cover** and **back cover (flap)** always show the same image from a single `imageBC` file (unless **Solid back cover** is enabled). Drop `imageBC` anywhere in a batch and it lands on the back cover panel, then mirrors to the flap.
 
-- Drop `imageX3` → copies to X2
-- Drag onto X2 → copies to X3
-
-X2 is rotated 180° on the print sheet (row 1). X3 is upright (row 4).
+The back cover panel is rotated 180° on the print sheet (row 1). The flap is upright (row 4).
 
 Removing the **source** panel clears the mirrored copy. Removing a **mirrored** copy only clears that panel; the source stays.
 
+Legacy names `imageBF`, `imageX2`, and `imageX3` still map to the back cover panels.
+
 ### Spine (cover alignment)
 
-When you glue X3 to X2, the two covers need to line up across the fold. Enable **Spine** in the options column:
+When you glue the flap to the back cover, the two sides need to line up across the fold. Enable **Spine** in the options column:
 
 | Control | Default | Description |
 |---------|---------|-------------|
@@ -134,16 +140,16 @@ When you glue X3 to X2, the two covers need to line up across the fold. Enable *
 
 When enabled:
 
-- A coloured band is drawn on the **right edge of X3 only**
-- The X3 image is shifted **left** by the spine width (same scale as X2, left edge cropped)
-- X2 is unchanged — no spine band on X2
+- A coloured band is drawn on the **right edge of the back cover (flap) only**
+- The flap image is shifted **left** by the spine width (same scale as the back cover, left edge cropped)
+- The back cover panel is unchanged — no spine band there
 - The offset is included in the downloaded PNG
 
 Spine width is calculated against A4 panel width (210 mm ÷ 4 = 52.5 mm per column), so 10 mm ≈ 19% of the panel.
 
 ### Tail (back cover credit strip)
 
-Enable **Tail** to add a vertical strip on X2 for credits or a colophon:
+Enable **Tail** to add a vertical strip on the back cover panel for credits or a colophon:
 
 | Control | Default | Description |
 |---------|---------|-------------|
@@ -155,28 +161,28 @@ Enable **Tail** to add a vertical strip on X2 for credits or a colophon:
 
 When enabled:
 
-- A band is drawn on the **left edge of X2** (cover-left when the panel is read upright)
-- The X2 image is inset to make room for the strip
+- A band is drawn on the **left edge of the back cover panel** (cover-left when the panel is read upright)
+- The back cover image is inset to make room for the strip
 - Included in the downloaded PNG
 
 ### Solid back cover
 
-Enable **Solid back cover** to replace images on X2 and X3 with a flat fill and optional text line:
+Enable **Solid back cover** to replace images on both back cover panels with a flat fill and optional text line:
 
 | Control | Default | Description |
 |---------|---------|-------------|
 | **Enable solid back** | off | Toggle solid fill on/off |
 | **Colour** | `#1b1b1b` | Background fill (matches spine/tail default) |
-| **Text** | (empty) | Optional line on both X2 and X3 |
+| **Text** | (empty) | Optional line on both back cover panels |
 | **Text colour** | `#ffffff` | Text colour |
 | **Position** | Middle | Top, middle, or bottom |
 | **Font** | Georgia | One of eight web-safe fonts |
 
-When enabled, X2 and X3 show the solid fill instead of images. Text is nudged to align with spine/tail insets when those are also enabled. Mirroring is suspended while solid back is on.
+When enabled, both back cover panels show the solid fill instead of images. Text is nudged to align with spine/tail insets when those are also enabled. Mirroring is suspended while solid back is on.
 
 ### Reading preview
 
-Below the sheet, pages appear in reading order: **Cover → 1 → 2 → … → 12**. This is how the zine reads once assembled; it does not reflect print-sheet orientation or spine/tail offset.
+Below the sheet, pages appear in reading order: **Front cover → 1 → 2 → … → 12 → Back cover**. This is how the zine reads once assembled; it does not reflect print-sheet orientation or spine/tail offset.
 
 ### Export
 
@@ -185,7 +191,7 @@ Click **Download sheet** to save `zine-sheet.png`:
 - **2480 × 3508 px** (A4 aspect ratio at ~300 DPI width)
 - Images use **cover-fit** (aspect ratio preserved, edges cropped if needed)
 - Flipped panels, tuck text, spine, tail, and solid back cover are baked in
-- 1 px gaps between cells; 2 px outer border
+- Panels are edge-to-edge with no grid lines or cell borders
 
 Print at **100% scale** on A4 paper for correct panel sizes.
 
@@ -221,11 +227,13 @@ Tested with Chrome, Safari, and Firefox.
 ## Tips
 
 - Use **portrait-oriented** source images when possible; landscape images are cover-fitted and may crop heavily
-- Enable the spine before export if you are gluing X3 to X2
+- Enable the spine before export if you are gluing the flap to the back cover
 - Hover the cut guides to confirm which panels to cut and which hinge to leave attached
-- Keep X2 and X3 as the same image — only one needs to be in your file batch if named `imageX3` or `imageX2`
-- Panel X1 cannot take an image; it always prints the tuck instruction
+- Only `imageBC` is needed for the back cover — it mirrors to both panels. Legacy `imageBF` is accepted too.
+- The flap panel cannot take an image; it always prints the tuck instruction
 
 ## License
 
-See repository owner for license terms.
+Copyright © 2026 Jim Moore.
+
+Released under the [MIT License](LICENSE). You may use, copy, modify, and distribute this software freely, provided the license and copyright notice are included.

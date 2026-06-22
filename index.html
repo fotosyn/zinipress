@@ -9,10 +9,53 @@
 <body>
   <header>
     <h1>Ziner</h1>
-    <p>Drop images named <code>imageC</code>, <code>image1</code>–<code>image12</code>, <code>imageX2</code>, <code>imageX3</code> onto the sheet. <code>imageX2</code> and <code>imageX3</code> mirror each other. Panel X1 prints with tuck instructions.</p>
+    <p>Build a fold-and-cut zine on one A4 sheet. <a href="#guide" id="guide-link">Guide and Privacy</a></p>
   </header>
 
   <main>
+    <details id="guide" class="instructions-panel panel">
+      <summary class="instructions-summary">Guide and Privacy</summary>
+      <div class="instructions-body">
+        <h3>1. Add your images</h3>
+        <p>Drop a batch onto the page, click <strong>Add images</strong>, or drag files onto individual panels. Name files so they auto-place:</p>
+        <ul>
+          <li><code>imageC</code> — front cover</li>
+          <li><code>image1</code> … <code>image12</code> — interior pages</li>
+          <li><code>imageBC</code> — back cover (fills both back cover panels)</li>
+        </ul>
+        <p>Spaces, underscores, and hyphens are ignored; the extension does not matter. The <strong>Flap</strong> panel is instruction-only and cannot take an image. Files that do not match a panel name appear under <strong>Unused images</strong> — drag them onto the sheet manually. Legacy names <code>imageX2</code> and <code>imageX3</code> still work.</p>
+
+        <h3>2. Arrange and edit</h3>
+        <ul>
+          <li>Drag between panels on the sheet or reading preview to move or swap images.</li>
+          <li>Drag inside an image on the sheet or reading preview to reposition it within its frame.</li>
+          <li>Click <strong>×</strong> on a panel to remove its image (it returns to Unused if it was not a mirror copy).</li>
+          <li>Hover the scissors beside the sheet to see where to cut (three panels across; one hinge panel stays attached).</li>
+        </ul>
+
+        <h3>3. Cover options</h3>
+        <ul>
+          <li><strong>Spine</strong> — band on the back cover (flap); shifts the image so it aligns when glued to the back cover.</li>
+          <li><strong>Tail</strong> — vertical credit strip on the back cover panel.</li>
+          <li><strong>Solid back cover</strong> — flat colour and optional text on both back cover panels instead of photos.</li>
+        </ul>
+
+        <h3>4. Export and print</h3>
+        <p>Click <strong>Download sheet</strong> for a print-ready PNG. Print at <strong>100% scale</strong> on A4. Fold and cut along the guide lines, then assemble using the flap tuck instruction.</p>
+        <p>The reading preview below the sheet shows pages in order: Front cover → 1 → 2 → … → 12 → Back cover. You can drop and reposition images there too — changes stay in sync with the print sheet.</p>
+
+        <h3 id="privacy">5. Privacy</h3>
+        <p>Ziner runs entirely in your browser. There is no backend, no sign-in, and no database.</p>
+        <ul>
+          <li><strong>Your images stay on your device.</strong> Files you add are held in memory while you work. Nothing is uploaded to a server, stored by us, or shared with third parties.</li>
+          <li><strong>Export is local.</strong> When you download the sheet, your browser saves the PNG to your device like any other file download.</li>
+          <li><strong>Session only.</strong> Closing the tab or clicking <strong>Clear all</strong> removes images from this session. Refreshing the page also clears your work.</li>
+          <li><strong>No tracking.</strong> This app does not use cookies, accounts, or analytics. It does not load third-party scripts or fonts.</li>
+        </ul>
+        <p>You are responsible for the content of images you add (e.g. photos of other people). We cannot access them because they never leave your browser.</p>
+      </div>
+    </details>
+
     <section class="workspace">
       <div class="action-bar">
         <label class="btn">
@@ -165,6 +208,16 @@
                 </label>
               </div>
             </div>
+
+            <div class="panel option-panel unused-panel">
+              <div class="panel-head">
+                <h2 class="column-header">Unused images</h2>
+              </div>
+              <div class="panel-body">
+                <p class="panel-hint">Files added without a matching panel name. Drag onto the sheet or reading preview to place manually.</p>
+                <div id="unused-items" class="unused-items" aria-live="polite"></div>
+              </div>
+            </div>
           </div>
         </aside>
       </div>
@@ -172,10 +225,17 @@
 
     <section class="preview-section">
       <h2 class="section-title">Reading preview</h2>
-      <p class="preview-hint">Pages in order as they appear when you read the zine.</p>
+      <p class="preview-hint">Pages in reading order. Drop images here or drag to reposition — changes sync with the print sheet.</p>
       <div id="reading-preview" class="reading-preview"></div>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <p>
+      By Jim Moore · 2026 ·
+      <a href="LICENSE">MIT License</a>
+    </p>
+  </footer>
 
   <script src="app.js"></script>
 </body>
