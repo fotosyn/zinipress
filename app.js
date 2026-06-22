@@ -25,6 +25,7 @@ const CELL_WIDTH_MM = 210 / 4;
 const MIRROR_PAIR = { X2: "X3", X3: "X2" };
 
 const TAIL_FONTS = [
+  { id: "public-sans", label: "Public Sans", family: '"Public Sans", system-ui, sans-serif' },
   { id: "georgia", label: "Georgia", family: 'Georgia, "Times New Roman", serif' },
   { id: "palatino", label: "Palatino", family: '"Palatino Linotype", Palatino, Georgia, serif' },
   { id: "helvetica", label: "Helvetica", family: 'Helvetica, Arial, sans-serif' },
@@ -51,7 +52,7 @@ const state = {
     bgColor: "#1b1b1b",
     textColor: "#ffffff",
     widthMm: 10,
-    fontId: "georgia",
+    fontId: "public-sans",
   },
   backCover: {
     enabled: false,
@@ -59,7 +60,7 @@ const state = {
     text: "",
     textColor: "#ffffff",
     textPosition: "middle",
-    fontId: "georgia",
+    fontId: "public-sans",
   },
 };
 
@@ -140,10 +141,10 @@ function tailFraction() {
 }
 
 function getSlotDisplayLabel(slot) {
-  if (slot.instruction) return "Flap (No image)";
+  if (slot.instruction) return "No image";
   if (slot.id === "C") return "Front Cover";
   if (slot.id === "X2") return "Back cover";
-  if (slot.id === "X3") return "Back cover (flap)";
+  if (slot.id === "X3") return "Back cover/Flap";
   return slot.id;
 }
 
