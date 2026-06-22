@@ -360,8 +360,6 @@ a:hover {
 }
 
 .sheet-diagram__fold-line--short {
-  left: 0;
-  right: 0;
   height: 0;
   border-top: 2.5px dashed var(--fold);
   transform: translateY(-50%);
@@ -369,14 +367,20 @@ a:hover {
 
 .sheet-diagram__fold-line--short.sheet-diagram__fold-line--pos-1 {
   top: 25%;
+  right: 0;
+  width: 25%;
 }
 
 .sheet-diagram__fold-line--short.sheet-diagram__fold-line--pos-2 {
   top: 50%;
+  left: 0;
+  width: 25%;
 }
 
 .sheet-diagram__fold-line--short.sheet-diagram__fold-line--pos-3 {
   top: 75%;
+  right: 0;
+  width: 25%;
 }
 
 .fold-block {
