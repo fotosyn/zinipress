@@ -502,8 +502,8 @@ function handleFiles(files) {
 function setupUnusedDragSource(el, unusedId) {
   el.draggable = true;
   el.addEventListener("dragstart", (e) => {
-    e.dataTransfer.setData("application/ziner-unused", unusedId);
-    e.dataTransfer.setData("application/ziner-source", "unused");
+    e.dataTransfer.setData("application/zinipress-unused", unusedId);
+    e.dataTransfer.setData("application/zinipress-source", "unused");
     e.dataTransfer.effectAllowed = "move";
   });
 }
@@ -515,8 +515,8 @@ function setupDragSource(el, slotId, source, { blockDragFrom = ".slot-image" } =
       e.preventDefault();
       return;
     }
-    e.dataTransfer.setData("application/ziner-slot", slotId);
-    e.dataTransfer.setData("application/ziner-source", source);
+    e.dataTransfer.setData("application/zinipress-slot", slotId);
+    e.dataTransfer.setData("application/zinipress-source", source);
     e.dataTransfer.effectAllowed = "move";
   });
 }
@@ -539,9 +539,9 @@ function setupSlotDrop(slotEl, slotId) {
 
     if (getSlot(slotId)?.instruction) return;
 
-    const fromSlot = e.dataTransfer.getData("application/ziner-slot");
-    const source = e.dataTransfer.getData("application/ziner-source");
-    const unusedId = e.dataTransfer.getData("application/ziner-unused");
+    const fromSlot = e.dataTransfer.getData("application/zinipress-slot");
+    const source = e.dataTransfer.getData("application/zinipress-source");
+    const unusedId = e.dataTransfer.getData("application/zinipress-unused");
 
     if (source === "unused" && unusedId) {
       placeFromUnused(unusedId, slotId);

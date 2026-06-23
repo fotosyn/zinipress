@@ -1,4 +1,4 @@
-# Ziner
+# ZiniPress
 
 A browser-based zine template builder. Arrange images on a single A4 print sheet using a drag-and-drop interface, with automatic panel rotation, cover mirroring, spine and tail bands, optional solid back cover, cut guides, and PNG export.
 
@@ -28,7 +28,7 @@ Open `index.html` in a modern browser. Some browsers restrict file drag-and-drop
 ### Option 2: Local server
 
 ```bash
-cd ziner
+cd zinipress
 python3 -m http.server 8765
 ```
 
@@ -91,7 +91,7 @@ Rules:
 
 ## Privacy
 
-Ziner runs entirely in your browser — no backend, sign-in, or database. Images stay in memory on your device and are **never uploaded**. Export saves a PNG locally; closing the tab, refreshing, or clicking **Clear all** ends the session. The app uses no cookies, accounts, analytics, or third-party scripts.
+ZiniPress runs entirely in your browser — no backend, sign-in, or database. Images stay in memory on your device and are **never uploaded**. Export saves a PNG locally; closing the tab, refreshing, or clicking **Clear all** ends the session. The app uses no cookies, accounts, analytics, or third-party scripts.
 
 Full details are in the collapsible **Guide and Privacy** section on the page.
 
@@ -198,7 +198,7 @@ Print at **100% scale** on A4 paper for correct panel sizes.
 ## Project structure
 
 ```
-ziner/
+zinipress/
 ├── index.html   # App shell and controls
 ├── style.css    # Layout, sheet grid, cut guides, panel styling
 ├── app.js       # Slot map, drag-drop, mirror, spine, tail, export
