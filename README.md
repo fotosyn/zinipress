@@ -234,6 +234,8 @@ Tested with Chrome, Safari, and Firefox.
 
 ## License
 
-Copyright © 2026 Jim Moore.
+Copyright © 2026 Fotosyn.
 
 Released under the [MIT License](LICENSE). You may use, copy, modify, and distribute this software freely, provided the license and copyright notice are included.
+
+The MIT License covers the code, not the ZiniPress or Fotosyn names. If you publish a fork or a hosted version, please give it a different name and don't present it as the official ZiniPress or as made by Fotosyn. A credit such as "based on ZiniPress by Fotosyn" is welcome.
